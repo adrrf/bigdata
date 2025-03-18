@@ -13,11 +13,49 @@
 
 ## Introduction
 
-TODO
+This project demonstrates how to run a Hive server and a PostgreSQL database as a metastore in order to perform distributed analysis of energy data. This includes setting up the environment, ingesting data, exploring and analyzing the data, and drawing conclusions from the analysis.
+
+The document structure is as follows, in section Setup and Configuration we will explore the changes made to the environment to support PostgreSQL as the metastore. In the Data Ingestion and Storage section we will how we populated the datasets into Hive. In the Data Exploration and Analysis section we will answer the given questions about the data. In the Conclusions section we will draw conclusions from the analysis and reflexions asked in the deliverable. In the Screenshots section we will provide screenshots of the results proving that all the SQL queries were executed successfully.
 
 ## Setup and Configuration
 
-TODO
+- Changed MySQL docker image in `docker-compose.yml` to a PostgreSQL.
+- Changed the DB_DRIVER from `mysql` to `postgres` in Hive images.
+- Changed the connection driver name and connection url to the corresponding ones.
+- In `hive/conf/hive-site.xml` removed MySQL metastore configuration to:
+
+```xml
+<property>
+  <name>javax.jdo.option.ConnectionURL</name>
+  <value>jdbc:postgresql://postgres:5432/metastore_db</value>
+</property>
+<property>
+  <name>javax.jdo.option.ConnectionDriverName</name>
+  <value>org.postgresql.Driver</value>
+</property>
+<property>
+  <name>javax.jdo.option.ConnectionUserName</name>
+  <value>hive</value>
+</property>
+<property>
+  <name>javax.jdo.option.ConnectionPassword</name>
+  <value>password</value>
+</property>
+```
+
+- Changed the `init.sql` file to:
+
+```sql
+CREATE DATABASE metastore_db;
+CREATE USER hive WITH PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE metastore_db TO hive;
+```
+
+To start the environment, run the following command:
+
+```bash
+docker-compose up -d
+```
 
 ## Data Ingestion and Storage
 
@@ -297,22 +335,20 @@ WITH consistencycheck AS (
         lclid,
         day,
         energy_sum,
-        LAG(day, 1) OVER (PARTITION BY lclid ORDER BY day) AS prev_day,
-        LEAD(day, 1) OVER (PARTITION BY lclid ORDER BY day) AS next_day
+        LAG(energy_sum, 1) OVER (PARTITION BY lclid ORDER BY day) AS prev_day,
+        LEAD(energy_sum, 1) OVER (PARTITION BY lclid ORDER BY day) AS next_day
     FROM consumos
-    WHERE energy_sum < 0.1
 )
 SELECT
     lclid,
-    COUNT(*) AS inconsistent_days_count
+    COUNT(*) AS consecutive_days_with_low_consumption
 FROM consistencycheck
 WHERE
-    DATEDIFF(day, prev_day) > 1
-    AND DATEDIFF(next_day, day) > 1
+    energy_sum < 0.1 AND prev_day < 0.1 AND next_day < 0.1
 GROUP BY lclid;
 ```
 
-The results shows that there has been 466 households that have been inconsistent for at least 3 days in a row.
+The results shows that there has been 213 households that have been inconsistent for at least 3 days in a row.
 
 10. Consumo total de energía por franja horaria (mañana, tarde, noche):
 
