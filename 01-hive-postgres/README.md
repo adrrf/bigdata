@@ -387,7 +387,9 @@ The results shows that there has been a difference in average consumption betwee
 
 ## Conclusions
 
-TODO
+We have successfully answered all questions. Personally, I did not found any significant difficulty regarding some special functions of Hive SQL, which i am not so familiar with.
+
+Regarding the impact of not using HDFS, is that we do not have any data persisted in a distributed file system, which can lead to data loss in case of failures. It can also lead to performance issues, as data is not distributed across multiple nodes, and all operations are performed on a single node. Finally, it is viable to use Hive without HDFS, but it is not recommended for production environments due to the lack of fault tolerance and scalability.
 
 ## Screenshots
 
