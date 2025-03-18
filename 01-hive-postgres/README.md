@@ -59,7 +59,7 @@ docker-compose up -d
 
 ## Data Ingestion and Storage
 
-To ingest the datasets into the PostgreSQL database, we first need to upload the files to the Hive server.
+To ingest the datasets into the PostgreSQL database, we first need to upload the files to the Hive server. We had deleted the first row of each csv file cause they contained headers.
 
 ```bash
 # copy the datasets to the hive server
@@ -88,7 +88,7 @@ CREATE TABLE clientes (
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
-TBLPROPERTIES ("skip.header.line.count"="1");
+TBLPROPERTIES ("skip.header.line.count"="1"); -- this did not work, i dont know why
 
 CREATE TABLE consumos (
     LCLid STRING,
@@ -104,7 +104,7 @@ CREATE TABLE consumos (
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
-TBLPROPERTIES ("skip.header.line.count"="1");
+TBLPROPERTIES ("skip.header.line.count"="1"); -- this did not work, i dont know why
 
 LOAD DATA INPATH '/opt/hive/data/warehouse/informations_households.csv' INTO TABLE clientes;
 LOAD DATA INPATH '/opt/hive/data/warehouse/daily_dataset.csv' INTO TABLE consumos;
