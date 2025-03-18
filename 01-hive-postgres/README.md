@@ -19,6 +19,8 @@ The document structure is as follows, in section Setup and Configuration we will
 
 ## Setup and Configuration
 
+We used the sample code provided in [S2 - Hive y Trino](https://github.com/josemarialuna/ing-datos-big-data-US/tree/main/S2-Hive%20y%20Trino). The following changes were made:
+
 - Changed MySQL docker image in `docker-compose.yml` to a PostgreSQL.
 - Changed the DB_DRIVER from `mysql` to `postgres` in Hive images.
 - Changed the connection driver name and connection url to the corresponding ones.
