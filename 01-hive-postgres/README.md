@@ -1,6 +1,6 @@
 # 01 - Distributed Analysis of Energy Data with Hive and PostgreSQL
 
----
+By Adrián Romero Flores. Source code available at this [link](https://github.com/adrrf/bigdata/tree/main/01-hive-postgres).
 
 ## Overview
 
@@ -10,6 +10,8 @@
 4. [Data Exploration and Analysis](#data-exploration-and-analysis)
 5. [Conclusions](#conclusions)
 6. [Screenshots](#screenshots)
+
+---
 
 ## Introduction
 
