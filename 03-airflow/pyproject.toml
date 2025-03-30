@@ -1,0 +1,7 @@
+[project]
+name = "03-airflow"
+version = "0.1.0"
+description = "iot data ingestion with airflow kafka hdfs and hive"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
