@@ -1,0 +1,51 @@
+[2025-03-31T22:01:13.381+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-03-31T22:01:13.397+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: sensor_data_pipeline.query_avg_temp manual__2025-03-31T21:56:00.899062+00:00 [queued]>
+[2025-03-31T22:01:13.403+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: sensor_data_pipeline.query_avg_temp manual__2025-03-31T21:56:00.899062+00:00 [queued]>
+[2025-03-31T22:01:13.403+0000] {taskinstance.py:2306} INFO - Starting attempt 2 of 2
+[2025-03-31T22:01:13.412+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): query_avg_temp> on 2025-03-31 21:56:00.899062+00:00
+[2025-03-31T22:01:13.416+0000] {standard_task_runner.py:64} INFO - Started process 235 to run task
+[2025-03-31T22:01:13.418+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', 'sensor_data_pipeline', 'query_avg_temp', 'manual__2025-03-31T21:56:00.899062+00:00', '--job-id', '55', '--raw', '--subdir', 'DAGS_FOLDER/pipeline.py', '--cfg-path', '/tmp/tmpmftv7xel']
+[2025-03-31T22:01:13.420+0000] {standard_task_runner.py:91} INFO - Job 55: Subtask query_avg_temp
+[2025-03-31T22:01:13.445+0000] {task_command.py:426} INFO - Running <TaskInstance: sensor_data_pipeline.query_avg_temp manual__2025-03-31T21:56:00.899062+00:00 [running]> on host airflow
+[2025-03-31T22:01:13.489+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='sensor_data_pipeline' AIRFLOW_CTX_TASK_ID='query_avg_temp' AIRFLOW_CTX_EXECUTION_DATE='2025-03-31T21:56:00.899062+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-03-31T21:56:00.899062+00:00'
+[2025-03-31T22:01:13.489+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-03-31T22:01:13.498+0000] {pipeline.py:178} INFO - Executing query to get average temperature by location and day
+[2025-03-31T22:01:13.504+0000] {base.py:84} INFO - Using connection ID 'hive_default' for task execution.
+[2025-03-31T22:01:13.535+0000] {hive.py:475} INFO - USE `default`
+[2025-03-31T22:01:13.555+0000] {hive.py:475} INFO - 
+            SELECT
+                record_datetime,
+                AVG(temperature_salon) AS avg_temperature_salon,
+                AVG(temperature_chambre) AS avg_temperature_chambre,
+                AVG(temperature_bureau) AS avg_temperature_bureau,
+                AVG(temperature_exterieur) AS avg_temperature_exterieur
+            FROM sensors.records
+            GROUP BY record_datetime
+        
+[2025-03-31T22:01:17.217+0000] {pipeline.py:194} INFO - Query executed successfully. Rows returned: None
+[2025-03-31T22:01:17.239+0000] {pipeline.py:207} ERROR - ❌ Error creating table: tuple index out of range
+Traceback (most recent call last):
+  File "/opt/airflow/dags/pipeline.py", line 198, in get_avg_temperature_by_location_and_day
+    f"Record date: {row[0]}, Location: {row[1]}, Avg Temperature Salon: {row[2]}, Avg Temperature Chambre: {row[3]}, Avg Temperature Bureau: {row[4]}, Avg Temperature Exterieur: {row[5]}"
+IndexError: tuple index out of range
+[2025-03-31T22:01:17.240+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-03-31T22:01:17.240+0000] {taskinstance.py:2905} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/models/taskinstance.py", line 465, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/models/taskinstance.py", line 432, in _execute_callable
+    return execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/models/baseoperator.py", line 401, in wrapper
+    return func(self, *args, **kwargs)
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/operators/python.py", line 235, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/operators/python.py", line 252, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/pipeline.py", line 198, in get_avg_temperature_by_location_and_day
+    f"Record date: {row[0]}, Location: {row[1]}, Avg Temperature Salon: {row[2]}, Avg Temperature Chambre: {row[3]}, Avg Temperature Bureau: {row[4]}, Avg Temperature Exterieur: {row[5]}"
+IndexError: tuple index out of range
+[2025-03-31T22:01:17.246+0000] {taskinstance.py:1206} INFO - Marking task as FAILED. dag_id=sensor_data_pipeline, task_id=query_avg_temp, run_id=manual__2025-03-31T21:56:00.899062+00:00, execution_date=20250331T215600, start_date=20250331T220113, end_date=20250331T220117
+[2025-03-31T22:01:17.253+0000] {standard_task_runner.py:110} ERROR - Failed to execute job 55 for task query_avg_temp (tuple index out of range; 235)
+[2025-03-31T22:01:17.295+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 1
+[2025-03-31T22:01:17.307+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-03-31T22:01:17.308+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

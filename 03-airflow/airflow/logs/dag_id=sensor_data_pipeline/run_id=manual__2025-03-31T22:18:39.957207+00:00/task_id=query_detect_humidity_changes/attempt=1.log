@@ -1,0 +1,188 @@
+[2025-03-31T22:18:58.727+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-03-31T22:18:58.736+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: sensor_data_pipeline.query_detect_humidity_changes manual__2025-03-31T22:18:39.957207+00:00 [queued]>
+[2025-03-31T22:18:58.739+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: sensor_data_pipeline.query_detect_humidity_changes manual__2025-03-31T22:18:39.957207+00:00 [queued]>
+[2025-03-31T22:18:58.739+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 2
+[2025-03-31T22:18:58.745+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): query_detect_humidity_changes> on 2025-03-31 22:18:39.957207+00:00
+[2025-03-31T22:18:58.747+0000] {standard_task_runner.py:64} INFO - Started process 244 to run task
+[2025-03-31T22:18:58.749+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', 'sensor_data_pipeline', 'query_detect_humidity_changes', 'manual__2025-03-31T22:18:39.957207+00:00', '--job-id', '81', '--raw', '--subdir', 'DAGS_FOLDER/pipeline.py', '--cfg-path', '/tmp/tmput4ck2xh']
+[2025-03-31T22:18:58.750+0000] {standard_task_runner.py:91} INFO - Job 81: Subtask query_detect_humidity_changes
+[2025-03-31T22:18:58.764+0000] {task_command.py:426} INFO - Running <TaskInstance: sensor_data_pipeline.query_detect_humidity_changes manual__2025-03-31T22:18:39.957207+00:00 [running]> on host airflow
+[2025-03-31T22:18:58.796+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='sensor_data_pipeline' AIRFLOW_CTX_TASK_ID='query_detect_humidity_changes' AIRFLOW_CTX_EXECUTION_DATE='2025-03-31T22:18:39.957207+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-03-31T22:18:39.957207+00:00'
+[2025-03-31T22:18:58.797+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-03-31T22:18:58.803+0000] {pipeline.py:271} INFO - Executing query to detect sharp humidity changes (>10% in one hour)
+[2025-03-31T22:18:58.808+0000] {base.py:84} INFO - Using connection ID 'hive_default' for task execution.
+[2025-03-31T22:18:58.824+0000] {hive.py:475} INFO - USE `default`
+[2025-03-31T22:18:58.836+0000] {hive.py:475} INFO - 
+            WITH humidity_with_lag AS (
+                SELECT
+                    record_datetime,
+                    humidity_salon,
+                    LAG(humidity_salon, 4) OVER (ORDER BY record_datetime) as prev_humidity_salon,
+                    humidity_chambre,
+                    LAG(humidity_chambre, 4) OVER (ORDER BY record_datetime) as prev_humidity_chambre,
+                    humidity_bureau,
+                    LAG(humidity_bureau, 4) OVER (ORDER BY record_datetime) as prev_humidity_bureau,
+                    humidity_exterieur,
+                    LAG(humidity_exterieur, 4) OVER (ORDER BY record_datetime) as prev_humidity_exterieur
+                FROM sensors.records
+            )
+
+            SELECT
+                record_datetime,
+                'Salon' as location,
+                humidity_salon as current_humidity,
+                prev_humidity_salon as previous_humidity,
+                ABS(humidity_salon - prev_humidity_salon) as humidity_change
+            FROM humidity_with_lag
+            WHERE ABS(humidity_salon - prev_humidity_salon) > 10
+            AND prev_humidity_salon IS NOT NULL
+
+            UNION ALL
+
+            SELECT
+                record_datetime,
+                'Chambre' as location,
+                humidity_chambre as current_humidity,
+                prev_humidity_chambre as previous_humidity,
+                ABS(humidity_chambre - prev_humidity_chambre) as humidity_change
+            FROM humidity_with_lag
+            WHERE ABS(humidity_chambre - prev_humidity_chambre) > 10
+            AND prev_humidity_chambre IS NOT NULL
+
+            UNION ALL
+
+            SELECT
+                record_datetime,
+                'Bureau' as location,
+                humidity_bureau as current_humidity,
+                prev_humidity_bureau as previous_humidity,
+                ABS(humidity_bureau - prev_humidity_bureau) as humidity_change
+            FROM humidity_with_lag
+            WHERE ABS(humidity_bureau - prev_humidity_bureau) > 10
+            AND prev_humidity_bureau IS NOT NULL
+
+            UNION ALL
+
+            SELECT
+                record_datetime,
+                'Exterieur' as location,
+                humidity_exterieur as current_humidity,
+                prev_humidity_exterieur as previous_humidity,
+                ABS(humidity_exterieur - prev_humidity_exterieur) as humidity_change
+            FROM humidity_with_lag
+            WHERE ABS(humidity_exterieur - prev_humidity_exterieur) > 10
+            AND prev_humidity_exterieur IS NOT NULL
+
+            ORDER BY humidity_change DESC
+        
+[2025-03-31T22:19:05.118+0000] {pipeline.py:347} INFO - Found 102 instances of sharp humidity changes (>10% in one hour)
+[2025-03-31T22:19:05.119+0000] {pipeline.py:350} INFO - Datetime | Location | Current Humidity | Humidity 1h before | Change (%)
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-09-13 | Exterieur | 89.25% | 45.375% | 43.875%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 89.0% | 48.875% | 40.125%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 86.875% | 48.3125% | 38.5625%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 84.3125% | 47.9375% | 36.375%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 81.5% | 47.75% | 33.75%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-09-06 | Exterieur | 83.8125% | 50.5% | 33.3125%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-09-13 | Exterieur | 59.125% | 89.25% | 30.125%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-09-16 | Exterieur | 63.0% | 84.875% | 21.875%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-10-03 | Exterieur | 52.375% | 73.1875% | 20.8125%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-10-03 | Exterieur | 51.0625% | 71.0% | 19.9375%
+[2025-03-31T22:19:05.119+0000] {pipeline.py:354} INFO - 2023-09-06 | Exterieur | 65.125% | 83.8125% | 18.6875%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-10-03 | Exterieur | 50.25% | 68.9375% | 18.6875%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 62.125% | 80.125% | 18.0%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-10-03 | Exterieur | 49.4375% | 66.875% | 17.4375%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-09-16 | Exterieur | 75.3125% | 59.1875% | 16.125%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-09-01 | Exterieur | 82.75% | 66.6875% | 16.0625%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 64.75% | 79.8125% | 15.0625%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-08-30 | Exterieur | 96.625% | 82.5% | 14.125%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-09-16 | Exterieur | 74.1875% | 60.3125% | 13.875%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-08-28 | Exterieur | 93.25% | 79.6875% | 13.5625%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-10-01 | Exterieur | 74.25% | 87.125% | 12.875%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-10-01 | Exterieur | 85.125% | 72.625% | 12.5%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-09-15 | Exterieur | 70.1875% | 57.875% | 12.3125%
+[2025-03-31T22:19:05.120+0000] {pipeline.py:354} INFO - 2023-09-24 | Exterieur | 69.625% | 81.8125% | 12.1875%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-09-24 | Exterieur | 72.0% | 84.125% | 12.125%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-10-01 | Exterieur | 77.1875% | 89.125% | 11.9375%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-09-24 | Exterieur | 74.375% | 86.1875% | 11.8125%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 67.5625% | 79.1875% | 11.625%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-09-16 | Exterieur | 72.8125% | 61.4375% | 11.375%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-09-24 | Exterieur | 76.9375% | 88.25% | 11.3125%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-09-30 | Exterieur | 79.203125% | 90.4375% | 11.234375%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 78.6875% | 67.5625% | 11.125%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 75.875% | 64.75% | 11.125%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-09-30 | Exterieur | 81.171875% | 70.171875% | 11.0%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-09-12 | Exterieur | 63.6875% | 74.6875% | 11.0%
+[2025-03-31T22:19:05.121+0000] {pipeline.py:354} INFO - 2023-10-01 | Exterieur | 69.125% | 80.125% | 11.0%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-21 | Exterieur | 78.5% | 67.5% | 11.0%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-10-04 | Exterieur | 73.125% | 62.125% | 11.0%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-10-01 | Exterieur | 71.6875% | 82.625% | 10.9375%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-15 | Exterieur | 68.9375% | 58.0% | 10.9375%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-10-02 | Exterieur | 72.0625% | 82.9375% | 10.875%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-08-30 | Exterieur | 77.125% | 66.25% | 10.875%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-27 | Exterieur | 61.625% | 72.5% | 10.875%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-21 | Exterieur | 76.125% | 65.3125% | 10.8125%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-10 | Exterieur | 60.8125% | 71.5625% | 10.75%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-27 | Exterieur | 64.25% | 75.0% | 10.75%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-10-01 | Exterieur | 80.125% | 90.875% | 10.75%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-08-28 | Exterieur | 82.25% | 92.875% | 10.625%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-27 | Exterieur | 66.875% | 77.5% | 10.625%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-21 | Exterieur | 81.25% | 70.625% | 10.625%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-21 | Exterieur | 73.75% | 63.125% | 10.625%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-21 | Exterieur | 63.125% | 52.5% | 10.625%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-19 | Exterieur | 62.75% | 73.375% | 10.625%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-12 | Exterieur | 65.75% | 55.1875% | 10.5625%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-08-30 | Exterieur | 74.6875% | 64.125% | 10.5625%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-10-02 | Exterieur | 69.875% | 80.4375% | 10.5625%
+[2025-03-31T22:19:05.122+0000] {pipeline.py:354} INFO - 2023-09-22 | Exterieur | 52.84375% | 63.40625% | 10.5625%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-08-30 | Exterieur | 62.0% | 51.5% | 10.5%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-25 | Exterieur | 70.25% | 59.75% | 10.5%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-10-01 | Exterieur | 66.6875% | 77.1875% | 10.5%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-17 | Exterieur | 67.25% | 77.75% | 10.5%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-27 | Exterieur | 59.1875% | 69.6875% | 10.5%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-25 | Exterieur | 62.125% | 51.6875% | 10.4375%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-22 | Exterieur | 54.96875% | 65.40625% | 10.4375%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-10 | Exterieur | 58.625% | 69.0625% | 10.4375%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-22 | Exterieur | 57.78125% | 68.21875% | 10.4375%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-09 | Exterieur | 60.671875% | 71.078125% | 10.40625%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-30 | Exterieur | 83.140625% | 72.734375% | 10.40625%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-25 | Exterieur | 59.75% | 49.375% | 10.375%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-10 | Exterieur | 63.6875% | 74.0625% | 10.375%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-12 | Exterieur | 45.375% | 35.0% | 10.375%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-09 | Exterieur | 63.296875% | 73.640625% | 10.34375%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-25 | Exterieur | 57.375% | 47.0625% | 10.3125%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-08 | Exterieur | 62.90625% | 73.21875% | 10.3125%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-12 | Exterieur | 47.9375% | 37.625% | 10.3125%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-08-30 | Exterieur | 59.375% | 49.0625% | 10.3125%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-07 | Exterieur | 62.515625% | 72.796875% | 10.28125%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-21 | Exterieur | 84.0% | 73.75% | 10.25%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-21 | Exterieur | 70.625% | 60.375% | 10.25%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-09-21 | Exterieur | 65.3125% | 55.0625% | 10.25%
+[2025-03-31T22:19:05.123+0000] {pipeline.py:354} INFO - 2023-10-02 | Exterieur | 57.4375% | 67.6875% | 10.25%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-19 | Exterieur | 60.5% | 70.75% | 10.25%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-17 | Exterieur | 69.8125% | 80.0625% | 10.25%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-25 | Exterieur | 64.875% | 54.625% | 10.25%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-12 | Exterieur | 67.5625% | 57.3125% | 10.25%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-06 | Exterieur | 62.125% | 72.375% | 10.25%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-10-01 | Exterieur | 61.25% | 51.0% | 10.25%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-10-02 | Exterieur | 67.6875% | 77.9375% | 10.25%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-08-30 | Exterieur | 72.25% | 62.0% | 10.25%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-21 | Exterieur | 86.3125% | 76.125% | 10.1875%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-25 | Exterieur | 72.3125% | 62.125% | 10.1875%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-16 | Exterieur | 73.15625% | 63.0% | 10.15625%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-11 | Bureau | 45.3% | 55.45% | 10.150001525878906%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-10-01 | Exterieur | 63.5% | 53.375% | 10.125%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-27 | Exterieur | 56.75% | 66.875% | 10.125%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-08-30 | Exterieur | 79.375% | 69.25% | 10.125%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-08-30 | Exterieur | 56.75% | 46.625% | 10.125%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-25 | Exterieur | 67.5% | 57.375% | 10.125%
+[2025-03-31T22:19:05.124+0000] {pipeline.py:354} INFO - 2023-09-12 | Exterieur | 67.125% | 77.25% | 10.125%
+[2025-03-31T22:19:05.125+0000] {pipeline.py:354} INFO - 2023-09-25 | Exterieur | 69.25% | 79.375% | 10.125%
+[2025-03-31T22:19:05.125+0000] {pipeline.py:354} INFO - 2023-09-08 | Exterieur | 60.53125% | 70.59375% | 10.0625%
+[2025-03-31T22:19:05.125+0000] {pipeline.py:354} INFO - 2023-10-02 | Exterieur | 59.8125% | 69.875% | 10.0625%
+[2025-03-31T22:19:05.125+0000] {pipeline.py:358} INFO - Closing Hive connection
+[2025-03-31T22:19:05.125+0000] {python.py:237} INFO - Done. Returned value was: None
+[2025-03-31T22:19:05.125+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-03-31T22:19:05.129+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=sensor_data_pipeline, task_id=query_detect_humidity_changes, run_id=manual__2025-03-31T22:18:39.957207+00:00, execution_date=20250331T221839, start_date=20250331T221858, end_date=20250331T221905
+[2025-03-31T22:19:05.164+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2025-03-31T22:19:05.174+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-03-31T22:19:05.174+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

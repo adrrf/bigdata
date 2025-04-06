@@ -1,0 +1,36 @@
+[2025-03-31T21:37:30.711+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-03-31T21:37:30.723+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: sensor_data_pipeline.publish_csv manual__2025-03-30T16:38:15.319337+00:00 [queued]>
+[2025-03-31T21:37:30.727+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: sensor_data_pipeline.publish_csv manual__2025-03-30T16:38:15.319337+00:00 [queued]>
+[2025-03-31T21:37:30.727+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 2
+[2025-03-31T21:37:30.735+0000] {taskinstance.py:2330} INFO - Executing <Task(ProduceToTopicOperator): publish_csv> on 2025-03-30 16:38:15.319337+00:00
+[2025-03-31T21:37:30.737+0000] {standard_task_runner.py:64} INFO - Started process 211 to run task
+[2025-03-31T21:37:30.739+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', 'sensor_data_pipeline', 'publish_csv', 'manual__2025-03-30T16:38:15.319337+00:00', '--job-id', '21', '--raw', '--subdir', 'DAGS_FOLDER/pipeline.py', '--cfg-path', '/tmp/tmp73lbzaa7']
+[2025-03-31T21:37:30.740+0000] {standard_task_runner.py:91} INFO - Job 21: Subtask publish_csv
+[2025-03-31T21:37:30.762+0000] {task_command.py:426} INFO - Running <TaskInstance: sensor_data_pipeline.publish_csv manual__2025-03-30T16:38:15.319337+00:00 [running]> on host airflow
+[2025-03-31T21:37:30.795+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='sensor_data_pipeline' AIRFLOW_CTX_TASK_ID='publish_csv' AIRFLOW_CTX_EXECUTION_DATE='2025-03-30T16:38:15.319337+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-03-30T16:38:15.319337+00:00'
+[2025-03-31T21:37:30.795+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-03-31T21:37:30.809+0000] {base.py:84} INFO - Using connection ID 'kafka_default' for task execution.
+[2025-03-31T21:37:30.810+0000] {produce.py:41} INFO - Producer <cimpl.Producer object at 0xffffa6ea3540>
+[2025-03-31T21:37:30.811+0000] {pipeline.py:39} INFO - Starting to read CSV file from /opt/airflow/datasets/home_temperature_and_humidity_smoothed_filled.csv
+[2025-03-31T21:37:30.822+0000] {pipeline.py:42} INFO - Successfully read CSV with 8137 rows
+[2025-03-31T21:37:30.822+0000] {pipeline.py:44} INFO - Renaming 'timestamp' column to 'record_datetime'
+[2025-03-31T21:37:30.823+0000] {pipeline.py:47} INFO - Converting DataFrame to dictionary records
+[2025-03-31T21:37:30.835+0000] {pipeline.py:50} INFO - Converting records to JSON strings
+[2025-03-31T21:37:30.873+0000] {pipeline.py:53} INFO - 📤 Prepared 8137 messages to send to Kafka topic 'sensores'
+[2025-03-31T21:37:30.874+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-03-31T21:37:30.874+0000] {taskinstance.py:2905} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/models/taskinstance.py", line 465, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/models/taskinstance.py", line 432, in _execute_callable
+    return execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/models/baseoperator.py", line 401, in wrapper
+    return func(self, *args, **kwargs)
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/providers/apache/kafka/operators/produce.py", line 126, in execute
+    for k, v in producer_callable():
+ValueError: too many values to unpack (expected 2)
+[2025-03-31T21:37:30.876+0000] {taskinstance.py:1206} INFO - Marking task as UP_FOR_RETRY. dag_id=sensor_data_pipeline, task_id=publish_csv, run_id=manual__2025-03-30T16:38:15.319337+00:00, execution_date=20250330T163815, start_date=20250331T213730, end_date=20250331T213730
+[2025-03-31T21:37:30.882+0000] {standard_task_runner.py:110} ERROR - Failed to execute job 21 for task publish_csv (too many values to unpack (expected 2); 211)
+[2025-03-31T21:37:30.912+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 1
+[2025-03-31T21:37:30.924+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-03-31T21:37:30.925+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

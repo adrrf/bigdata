@@ -1,0 +1,38 @@
+[2025-03-31T22:11:37.473+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-03-31T22:11:37.481+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: sensor_data_pipeline.query_avg_temp manual__2025-03-31T22:11:27.987511+00:00 [queued]>
+[2025-03-31T22:11:37.483+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: sensor_data_pipeline.query_avg_temp manual__2025-03-31T22:11:27.987511+00:00 [queued]>
+[2025-03-31T22:11:37.483+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 2
+[2025-03-31T22:11:37.490+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): query_avg_temp> on 2025-03-31 22:11:27.987511+00:00
+[2025-03-31T22:11:37.492+0000] {standard_task_runner.py:64} INFO - Started process 218 to run task
+[2025-03-31T22:11:37.494+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', 'sensor_data_pipeline', 'query_avg_temp', 'manual__2025-03-31T22:11:27.987511+00:00', '--job-id', '71', '--raw', '--subdir', 'DAGS_FOLDER/pipeline.py', '--cfg-path', '/tmp/tmpjkh79tyl']
+[2025-03-31T22:11:37.494+0000] {standard_task_runner.py:91} INFO - Job 71: Subtask query_avg_temp
+[2025-03-31T22:11:37.509+0000] {task_command.py:426} INFO - Running <TaskInstance: sensor_data_pipeline.query_avg_temp manual__2025-03-31T22:11:27.987511+00:00 [running]> on host airflow
+[2025-03-31T22:11:37.534+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='sensor_data_pipeline' AIRFLOW_CTX_TASK_ID='query_avg_temp' AIRFLOW_CTX_EXECUTION_DATE='2025-03-31T22:11:27.987511+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-03-31T22:11:27.987511+00:00'
+[2025-03-31T22:11:37.534+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-03-31T22:11:37.539+0000] {pipeline.py:178} INFO - Executing query to get average temperature by location and day
+[2025-03-31T22:11:37.542+0000] {base.py:84} INFO - Using connection ID 'hive_default' for task execution.
+[2025-03-31T22:11:37.554+0000] {hive.py:475} INFO - USE `default`
+[2025-03-31T22:11:37.561+0000] {hive.py:475} INFO - 
+            SELECT
+                record_datetime,
+                AVG(temperature_salon) AS avg_temperature_salon,
+                AVG(temperature_chambre) AS avg_temperature_chambre,
+                AVG(temperature_bureau) AS avg_temperature_bureau,
+                AVG(temperature_exterieur) AS avg_temperature_exterieur
+            FROM sensors.records
+            GROUP BY record_datetime
+        
+[2025-03-31T22:11:38.995+0000] {pipeline.py:197} INFO - Query executed successfully. Rows returned: [('2023-09-01', 23.781093692779542, 24.622031259536744, 24.38828134536743, 22.58396863937378), ('2023-09-02', 23.318880180517834, 25.725260416666668, 24.493750055631, 20.56173825263977), ('2023-09-03', 25.076367179552715, 27.03476558128993, 25.541210909684498, 21.27413413921992), ('2023-09-04', 25.717633928571427, 27.129687513623917, 26.048214231218612, 17.479776654924667)]
+[2025-03-31T22:11:38.996+0000] {pipeline.py:198} INFO - Results:
+[2025-03-31T22:11:38.996+0000] {pipeline.py:199} INFO - datetime | avg_temperature_salon | avg_temperature_chambre | avg_temperature_bureau | avg_temperature_exterieur
+[2025-03-31T22:11:38.996+0000] {pipeline.py:203} INFO - ('2023-09-01', 23.781093692779542, 24.622031259536744, 24.38828134536743, 22.58396863937378)
+[2025-03-31T22:11:38.997+0000] {pipeline.py:203} INFO - ('2023-09-02', 23.318880180517834, 25.725260416666668, 24.493750055631, 20.56173825263977)
+[2025-03-31T22:11:38.997+0000] {pipeline.py:203} INFO - ('2023-09-03', 25.076367179552715, 27.03476558128993, 25.541210909684498, 21.27413413921992)
+[2025-03-31T22:11:38.997+0000] {pipeline.py:203} INFO - ('2023-09-04', 25.717633928571427, 27.129687513623917, 26.048214231218612, 17.479776654924667)
+[2025-03-31T22:11:38.997+0000] {pipeline.py:204} INFO - Closing Hive connection
+[2025-03-31T22:11:38.997+0000] {python.py:237} INFO - Done. Returned value was: None
+[2025-03-31T22:11:38.997+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-03-31T22:11:39.006+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=sensor_data_pipeline, task_id=query_avg_temp, run_id=manual__2025-03-31T22:11:27.987511+00:00, execution_date=20250331T221127, start_date=20250331T221137, end_date=20250331T221139
+[2025-03-31T22:11:39.066+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2025-03-31T22:11:39.083+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-03-31T22:11:39.098+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

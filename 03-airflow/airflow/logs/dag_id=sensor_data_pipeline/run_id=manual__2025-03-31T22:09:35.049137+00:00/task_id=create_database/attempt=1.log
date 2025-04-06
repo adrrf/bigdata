@@ -1,0 +1,25 @@
+[2025-03-31T22:09:45.738+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-03-31T22:09:45.749+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: sensor_data_pipeline.create_database manual__2025-03-31T22:09:35.049137+00:00 [queued]>
+[2025-03-31T22:09:45.752+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: sensor_data_pipeline.create_database manual__2025-03-31T22:09:35.049137+00:00 [queued]>
+[2025-03-31T22:09:45.752+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 2
+[2025-03-31T22:09:45.759+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): create_database> on 2025-03-31 22:09:35.049137+00:00
+[2025-03-31T22:09:45.762+0000] {standard_task_runner.py:64} INFO - Started process 192 to run task
+[2025-03-31T22:09:45.764+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', 'sensor_data_pipeline', 'create_database', 'manual__2025-03-31T22:09:35.049137+00:00', '--job-id', '68', '--raw', '--subdir', 'DAGS_FOLDER/pipeline.py', '--cfg-path', '/tmp/tmpm_wm2c4t']
+[2025-03-31T22:09:45.765+0000] {standard_task_runner.py:91} INFO - Job 68: Subtask create_database
+[2025-03-31T22:09:45.781+0000] {task_command.py:426} INFO - Running <TaskInstance: sensor_data_pipeline.create_database manual__2025-03-31T22:09:35.049137+00:00 [running]> on host airflow
+[2025-03-31T22:09:45.810+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='sensor_data_pipeline' AIRFLOW_CTX_TASK_ID='create_database' AIRFLOW_CTX_EXECUTION_DATE='2025-03-31T22:09:35.049137+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-03-31T22:09:35.049137+00:00'
+[2025-03-31T22:09:45.810+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-03-31T22:09:45.815+0000] {pipeline.py:111} INFO - Creating Hive database 'sensors' if it doesn't exist
+[2025-03-31T22:09:45.815+0000] {pipeline.py:113} INFO - Connecting to Hive using HiveServer2Hook
+[2025-03-31T22:09:45.819+0000] {base.py:84} INFO - Using connection ID 'hive_default' for task execution.
+[2025-03-31T22:09:45.845+0000] {hive.py:475} INFO - USE `default`
+[2025-03-31T22:09:45.874+0000] {pipeline.py:118} INFO - Executing CREATE DATABASE IF NOT EXISTS sensors
+[2025-03-31T22:09:45.874+0000] {hive.py:475} INFO - CREATE DATABASE IF NOT EXISTS sensors
+[2025-03-31T22:09:45.877+0000] {pipeline.py:121} INFO - Closing Hive connection
+[2025-03-31T22:09:45.879+0000] {pipeline.py:125} INFO - ✅ Database 'sensors' created successfully
+[2025-03-31T22:09:45.879+0000] {python.py:237} INFO - Done. Returned value was: None
+[2025-03-31T22:09:45.879+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-03-31T22:09:45.882+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=sensor_data_pipeline, task_id=create_database, run_id=manual__2025-03-31T22:09:35.049137+00:00, execution_date=20250331T220935, start_date=20250331T220945, end_date=20250331T220945
+[2025-03-31T22:09:45.914+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2025-03-31T22:09:45.924+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-03-31T22:09:45.927+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

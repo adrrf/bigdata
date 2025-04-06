@@ -1,0 +1,67 @@
+[2025-03-31T22:09:51.538+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-03-31T22:09:51.547+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: sensor_data_pipeline.query_worst_air_quality manual__2025-03-31T22:09:35.049137+00:00 [queued]>
+[2025-03-31T22:09:51.550+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: sensor_data_pipeline.query_worst_air_quality manual__2025-03-31T22:09:35.049137+00:00 [queued]>
+[2025-03-31T22:09:51.550+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 2
+[2025-03-31T22:09:51.556+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): query_worst_air_quality> on 2025-03-31 22:09:35.049137+00:00
+[2025-03-31T22:09:51.558+0000] {standard_task_runner.py:64} INFO - Started process 231 to run task
+[2025-03-31T22:09:51.559+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', 'sensor_data_pipeline', 'query_worst_air_quality', 'manual__2025-03-31T22:09:35.049137+00:00', '--job-id', '71', '--raw', '--subdir', 'DAGS_FOLDER/pipeline.py', '--cfg-path', '/tmp/tmprlj673at']
+[2025-03-31T22:09:51.560+0000] {standard_task_runner.py:91} INFO - Job 71: Subtask query_worst_air_quality
+[2025-03-31T22:09:51.573+0000] {task_command.py:426} INFO - Running <TaskInstance: sensor_data_pipeline.query_worst_air_quality manual__2025-03-31T22:09:35.049137+00:00 [running]> on host airflow
+[2025-03-31T22:09:51.597+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='sensor_data_pipeline' AIRFLOW_CTX_TASK_ID='query_worst_air_quality' AIRFLOW_CTX_EXECUTION_DATE='2025-03-31T22:09:35.049137+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-03-31T22:09:35.049137+00:00'
+[2025-03-31T22:09:51.598+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-03-31T22:09:51.602+0000] {pipeline.py:212} INFO - Executing query to find the 10 worst air quality moments across any location
+[2025-03-31T22:09:51.605+0000] {base.py:84} INFO - Using connection ID 'hive_default' for task execution.
+[2025-03-31T22:09:51.618+0000] {hive.py:475} INFO - USE `default`
+[2025-03-31T22:09:51.626+0000] {hive.py:475} INFO - 
+            SELECT
+                record_datetime,
+                'Salon' as location,
+                air_salon as air_quality
+            FROM sensors.records
+
+            UNION ALL
+
+            SELECT
+                record_datetime,
+                'Chambre' as location,
+                air_chambre as air_quality
+            FROM sensors.records
+
+            UNION ALL
+
+            SELECT
+                record_datetime,
+                'Bureau' as location,
+                air_bureau as air_quality
+            FROM sensors.records
+
+            UNION ALL
+
+            SELECT
+                record_datetime,
+                'Exterieur' as location,
+                air_exterieur as air_quality
+            FROM sensors.records
+
+            ORDER BY air_quality DESC
+            LIMIT 10
+        
+[2025-03-31T22:09:52.977+0000] {pipeline.py:258} INFO - Top 10 worst air quality measurements:
+[2025-03-31T22:09:52.978+0000] {pipeline.py:259} INFO - Datetime | Location | Air Quality Value
+[2025-03-31T22:09:52.978+0000] {pipeline.py:261} INFO - 2023-09-01 | Salon | 2363.0
+[2025-03-31T22:09:52.978+0000] {pipeline.py:261} INFO - 2023-09-01 | Salon | 2352.0
+[2025-03-31T22:09:52.978+0000] {pipeline.py:261} INFO - 2023-09-01 | Salon | 2342.0
+[2025-03-31T22:09:52.979+0000] {pipeline.py:261} INFO - 2023-09-01 | Salon | 2330.0
+[2025-03-31T22:09:52.979+0000] {pipeline.py:261} INFO - 2023-09-01 | Salon | 2320.0
+[2025-03-31T22:09:52.979+0000] {pipeline.py:261} INFO - 2023-09-01 | Salon | 2314.0
+[2025-03-31T22:09:52.979+0000] {pipeline.py:261} INFO - 2023-09-02 | Salon | 2271.0
+[2025-03-31T22:09:52.979+0000] {pipeline.py:261} INFO - 2023-08-29 | Salon | 2268.0
+[2025-03-31T22:09:52.979+0000] {pipeline.py:261} INFO - 2023-09-01 | Salon | 2259.0
+[2025-03-31T22:09:52.979+0000] {pipeline.py:261} INFO - 2023-08-29 | Salon | 2256.0
+[2025-03-31T22:09:52.979+0000] {pipeline.py:263} INFO - Closing Hive connection
+[2025-03-31T22:09:52.979+0000] {python.py:237} INFO - Done. Returned value was: None
+[2025-03-31T22:09:52.980+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-03-31T22:09:52.985+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=sensor_data_pipeline, task_id=query_worst_air_quality, run_id=manual__2025-03-31T22:09:35.049137+00:00, execution_date=20250331T220935, start_date=20250331T220951, end_date=20250331T220952
+[2025-03-31T22:09:53.028+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2025-03-31T22:09:53.039+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-03-31T22:09:53.040+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

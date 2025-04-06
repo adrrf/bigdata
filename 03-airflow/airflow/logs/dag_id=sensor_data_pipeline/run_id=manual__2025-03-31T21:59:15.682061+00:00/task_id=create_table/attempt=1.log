@@ -1,0 +1,46 @@
+[2025-03-31T21:59:24.845+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-03-31T21:59:24.854+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: sensor_data_pipeline.create_table manual__2025-03-31T21:59:15.682061+00:00 [queued]>
+[2025-03-31T21:59:24.856+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: sensor_data_pipeline.create_table manual__2025-03-31T21:59:15.682061+00:00 [queued]>
+[2025-03-31T21:59:24.856+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 2
+[2025-03-31T21:59:24.862+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): create_table> on 2025-03-31 21:59:15.682061+00:00
+[2025-03-31T21:59:24.864+0000] {standard_task_runner.py:64} INFO - Started process 207 to run task
+[2025-03-31T21:59:24.866+0000] {standard_task_runner.py:90} INFO - Running: ['airflow', 'tasks', 'run', 'sensor_data_pipeline', 'create_table', 'manual__2025-03-31T21:59:15.682061+00:00', '--job-id', '47', '--raw', '--subdir', 'DAGS_FOLDER/pipeline.py', '--cfg-path', '/tmp/tmp5mcjs4b5']
+[2025-03-31T21:59:24.866+0000] {standard_task_runner.py:91} INFO - Job 47: Subtask create_table
+[2025-03-31T21:59:24.880+0000] {task_command.py:426} INFO - Running <TaskInstance: sensor_data_pipeline.create_table manual__2025-03-31T21:59:15.682061+00:00 [running]> on host airflow
+[2025-03-31T21:59:24.906+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='sensor_data_pipeline' AIRFLOW_CTX_TASK_ID='create_table' AIRFLOW_CTX_EXECUTION_DATE='2025-03-31T21:59:15.682061+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-03-31T21:59:15.682061+00:00'
+[2025-03-31T21:59:24.906+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-03-31T21:59:24.910+0000] {pipeline.py:132} INFO - Creating Hive table 'sensors.records'
+[2025-03-31T21:59:24.910+0000] {pipeline.py:134} INFO - Connecting to Hive using HiveServer2Hook
+[2025-03-31T21:59:24.913+0000] {base.py:84} INFO - Using connection ID 'hive_default' for task execution.
+[2025-03-31T21:59:24.934+0000] {hive.py:475} INFO - USE `default`
+[2025-03-31T21:59:24.945+0000] {pipeline.py:139} INFO - Dropping existing table if it exists
+[2025-03-31T21:59:24.945+0000] {hive.py:475} INFO - DROP TABLE IF EXISTS sensors.records
+[2025-03-31T21:59:25.021+0000] {pipeline.py:142} INFO - Creating new table with HDFS location hdfs://namenode:9000/topics/sensores/partition=0
+[2025-03-31T21:59:25.022+0000] {hive.py:475} INFO - 
+            CREATE TABLE IF NOT EXISTS sensors.records (
+                record_datetime DATE,
+                temperature_salon FLOAT,
+                humidity_salon FLOAT,
+                air_salon FLOAT,
+                temperature_chambre FLOAT,
+                humidity_chambre FLOAT,
+                air_chambre FLOAT,
+                temperature_bureau FLOAT,
+                humidity_bureau FLOAT,
+                air_bureau FLOAT,
+                temperature_exterieur FLOAT,
+                humidity_exterieur FLOAT,
+                air_exterieur FLOAT
+            )
+            ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
+            STORED AS TEXTFILE
+            LOCATION 'hdfs://namenode:9000/topics/sensores/partition=0'
+        
+[2025-03-31T21:59:25.066+0000] {pipeline.py:166} INFO - Closing Hive connection
+[2025-03-31T21:59:25.068+0000] {pipeline.py:170} INFO - ✅ Table 'sensors.records' created successfully
+[2025-03-31T21:59:25.068+0000] {python.py:237} INFO - Done. Returned value was: None
+[2025-03-31T21:59:25.068+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-03-31T21:59:25.071+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=sensor_data_pipeline, task_id=create_table, run_id=manual__2025-03-31T21:59:15.682061+00:00, execution_date=20250331T215915, start_date=20250331T215924, end_date=20250331T215925
+[2025-03-31T21:59:25.085+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2025-03-31T21:59:25.094+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2025-03-31T21:59:25.096+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

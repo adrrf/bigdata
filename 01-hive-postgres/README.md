@@ -9,7 +9,6 @@ By Adrián Romero Flores. Source code available at this [link](https://github.co
 3. [Data Ingestion and Storage](#data-ingestion-and-storage)
 4. [Data Exploration and Analysis](#data-exploration-and-analysis)
 5. [Conclusions](#conclusions)
-6. [Screenshots](#screenshots)
 
 ---
 
@@ -154,6 +153,8 @@ Their results will be displayed below.
 | MAC000131      | 2011-12-22   | 0.08900000154972076    | 0.2213541716337204   | 1.093999981880188   | 48                    | 0.26723888516426086 | 10.625              | 0.06199999898672104 |
 | MAC000131      | 2011-12-23   | 0.16050000488758087    | 0.29112499952316284  | 0.7490000128746033  | 48                    | 0.24907605350017548 | 13.973999977111816  | 0.06499999761581421 |
 | MAC000131      | 2011-12-24   | 0.10700000077486038    | 0.16899999976158142  | 0.6129999756813049  | 47                    | 0.1506846696138382  | 7.942999839782715   | 0.06499999761581421 |
+
+(Apologies for the visualization of last table md to pdf conversion is weird)
 
 2. Count the number of households in each socioeconomic category (Acorn): We will use the `COUNT` and `GROUP BY` functions to count the number of households in each socioeconomic category. The query will look like this:
 
@@ -314,7 +315,15 @@ The results are:
 8. Compare the consumption of households with different tariff types: For this comparison we will compare the statistical metrics for energy consumption. These metrics are: `count`, `sum`, `mean`, `median`, `std`, `max` and `min`.
 
 ```sql
-SELECT cl.stdortou, AVG(c.energy_count) AS avg_count, AVG(c.energy_sum) AS avg_sum, AVG(c.energy_mean) AS avg_mean, AVG(c.energy_median) AS avg_median, AVG(c.energy_std) AS avg_std, AVG(c.energy_max) AS avg_max, AVG(c.energy_min) AS avg_min
+SELECT
+    cl.stdortou,
+    AVG(c.energy_count) AS avg_count,
+    AVG(c.energy_sum) AS avg_sum,
+    AVG(c.energy_mean) AS avg_mean,
+    AVG(c.energy_median) AS avg_median,
+    AVG(c.energy_std) AS avg_std,
+    AVG(c.energy_max) AS avg_max,
+    AVG(c.energy_min) AS avg_min
 FROM consumos c
 JOIN clientes cl ON c.lclid = cl.lclid
 GROUP BY cl.stdortou;
@@ -359,7 +368,7 @@ The results shows that there has been 213 households that have been inconsistent
 > [!IMPORTANT]
 > This exercise is not possible with the given dataset.
 
-11. Final Boss 😈: How much does the average consumption change between weekdays and weekends?: To analyze how energy consumption patterns differ between weekdays and weekends, we will use the `DAYOFWEEK` function to classify days and calculate average consumption for each type. We first mark each day as either a weekday or weekend, then averages the energy consumption for each category.
+11. Final Boss: How much does the average consumption change between weekdays and weekends?: To analyze how energy consumption patterns differ between weekdays and weekends, we will use the `DAYOFWEEK` function to classify days and calculate average consumption for each type. We first mark each day as either a weekday or weekend, then averages the energy consumption for each category.
 
 ```sql
 WITH consumption_by_day_type AS (
